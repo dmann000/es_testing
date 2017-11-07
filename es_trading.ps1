@@ -1,4 +1,5 @@
-$data = import-csv $env:userprofile + "\Documents\personal\es_5min_sample.csv"
+$mydocs = [Environment]::GetFolderPath("MyDocuments")
+$data = import-csv ($mydocs + "\Github\es_testing\es_5min_sample.csv")
 $high = $null
 $low = $null
 $hod = $null
