@@ -7,7 +7,7 @@ $lod = $null
 $day = $null
 
 
-foreach($line in $data[0-3]){
+foreach($line in $data[0..3]){
     if $day -eq $null{
         $day = $data.date
     }
