@@ -1,23 +1,37 @@
 $mydocs = [Environment]::GetFolderPath("MyDocuments")
 $data = import-csv ($mydocs + "\Github\es_testing\es_5min_sample.csv")
+$day = $null
+
+# Gets all unique dates within the CSV and writes them to an array variable
+$dates = $data | Select-Object -Property Date -Unique
+
+# Run a loop against each day in the dates array
+Foreach($day in $dates) 
+{
+#Set the following variables to $null on each new day
 $high = $null
 $low = $null
 $hod = $null
 $lod = $null
-$day = $null
+
+# Run a loop against only the lines that match the current $day variable
+foreach($line in ($data | where-object {$_.date -eq $day.date})) 
+{
+    
+# If $line.high is greater than $hod then set $hod to that value
+    if ($line.high -gt $hod)
+    {
+        $hod = $line.high
+    }
 
 
-foreach($line in $data[0..3]){
-    if $day -eq $null{
-        $day = $data.date
-    }
-    if ($line.high -gt $hod){
-        $line.high = $hod
-    }
-    if ($line.low -lt $lod){
-        $line.low = $lod
+# If $lod is null or $line.low is lower than $lod then set $lod to that value
+    if ($lod -eq $null -or $line.low -lt $lod)
+    {
+        $lod = $line.low
     }
 
     
 
+}
 }
