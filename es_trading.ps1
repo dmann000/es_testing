@@ -15,12 +15,31 @@ $high = $null
 $low = $null
 $hod = $null
 $lod = $null
+$hodtime = $null
+$lodtime = $null
 
 # Run a loop against only the lines that match the current $day variable
 foreach($line in ($data | where-object {$_.date -eq $day.date})) 
 {
 if((get-date $line.time).hour -lt 11){
-write-host $line.time
+
+# check each line to see if the high is higher than prior bar
+if($line.high -gt $hod){
+$hod = $line.high
+$hodtime = $line.time
+write-host "high" $hod 
+write-host "time" $hodtime
+}
+
+# check each line to see if the low is lower than the prior bar
+
+if($lod -eq $null -or $line.low -lt $lod){
+$lod = $line.low
+$lodtime = $line.time
+write-host "low" $lod 
+write-host "time" $lodtime
+}
+
 }}}
 
 <#
