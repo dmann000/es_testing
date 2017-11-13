@@ -41,28 +41,3 @@ write-host "time" $lodtime
 }
 
 }}}
-
-<#
-
-
-
-    
-# If $line.high is greater than $hod then set $hod to that value
-    if ($line.high -gt $hod)
-    {
-        $hod = $line.high
-    }
-
-
-# If $lod is null or $line.low is lower than $lod then set $lod to that value
-    if ($lod -eq $null -or $line.low -lt $lod)
-    {
-        $lod = $line.low
-    }
-
-    
-
-}
-}
-
-#>
