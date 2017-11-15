@@ -5,22 +5,29 @@ $day = $null
 # Gets all unique dates within the CSV and writes them to an array variable
 $dates = $data | Select-Object -Property Date -Unique
 
-$dates = $dates[6]
+$dates = $dates[55]
 
 # Run a loop against each day in the dates array
 Foreach($day in $dates) 
 {
 #Set the following variables to $null on each new day
-$high = $null
-$low = $null
-$hod = $null
-$lod = $null
-$hodtime = $null
-$lodtime = $null
+$currhigh = $null
+$currlow = $null
 
 # Run a loop against only the lines that match the current $day variable
 foreach($line in ($data | where-object {$_.date -eq $day.date})) 
 {
+if($line.high -gt $currhigh){
+$currhigh = $line.high
+$currhightime = $line.time
+write-host $currhigh
+write-host $currhightime
+}
+}
+}
+
+<#
+
 if((get-date $line.time).hour -lt 11){
 
 # check each line to see if the high is higher than prior bar
@@ -41,3 +48,4 @@ write-host "time" $lodtime
 }
 
 }}}
+#>
