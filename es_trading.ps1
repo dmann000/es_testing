@@ -54,8 +54,20 @@ Foreach($day in $dates)
     }
     
     elseif($status -eq "look4high"){
-    write-host "4high"
-    }    
+    
+    <#low4high
+	we have an established low, and are now looking for the next high (but still need to check if make a new low)
+	#>
+
+    if($line.low -lt $maybelow.low){
+	    $maybelow = $line | select-object -Property low,time
+	    $maybehigh = $line | select-object -Property high,time
+	    $status = "look4low"
+	    }elseif($line.high -gt $currhigh.high){
+	    $currhigh = $line | select-object -Property high,time
+    
+        write-host "4high"
+    }}    
     
     elseif($status -eq "high4low"){
     write-host "h4l"
