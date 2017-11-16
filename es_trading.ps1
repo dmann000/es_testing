@@ -59,7 +59,7 @@ Foreach($day in $dates)
 	we have an established low, and are now looking for the next high (but still need to check if make a new low)
 	#>
 
-    if($line.low -lt $maybelow.low){
+    if($line.low -lt $currentlow.low){
 	    $maybelow = $line | select-object -Property low,time
 	    $maybehigh = $line | select-object -Property high,time
 	    $status = "look4low"
@@ -71,6 +71,15 @@ Foreach($day in $dates)
     
     elseif($status -eq "high4low"){
     write-host "h4l"
+
+    if($line.high -gt $currhigh.high){
+	$currlow = $line | select-object -Property low,time
+	$currhigh = $line | select-object -Property high,time
+	$status = look4low
+	}elseif{($line.high -gt $currhigh.high){
+	$currhigh = $line | select-object -Property high,time
+
+
     }
     else{
 
@@ -92,12 +101,12 @@ Foreach($day in $dates)
     # now check to see which is "older"
     if($currhigh.time -lt $currlow.time){ # THIS SEEMS BACKWARD TO ME!!!
         $dailyhighs.add($currhigh)
-        $status = "look4low"
+        $status = "look4low" # switch to low4high?
         }
 
     else{
         $dailylows.add($currlow)
-        $status = "look4high"
+        $status = "high4low"
        }
 
     }
