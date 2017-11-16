@@ -29,25 +29,56 @@ $currhigh = $null
 $currlow = $null
 $lod = $null
 $hod = $null
+$priorhigh = $null
+$priorlow = $null
+
 
 # Run a loop against only the lines that match the current $day variable
 foreach($line in ($data | where-object {$_.date -eq $day.date})) 
 {
 
-write-host $line.time
+#write-host $line.time
 
 if($line.high -gt $currhigh.high){
 $currhigh = $line | select-object -Property high,time
-write-host high $line.high
-write-host hod $currhigh.high
+#write-host high $line.high
+#write-host hod $currhigh.high
 }
 if($currlow -eq $null -or $line.low -lt $currlow.low){
 $currlow = $line | select-object -Property low,time
-write-host low $line.low
-write-host lod $currlow.low
+#write-host low $line.low
+#write-host lod $currlow.low
 }
 
 
+# now check to see if we have enough distance from currhigh and currlow to establish whichever is "older"
+if($currhigh.high - $currlow.low -ge 10){
+
+# now check to see which is "older"
+if($currhigh.time -gt $currlow.time)
+    {$priorhigh = $currhigh
+    $currhigh = $line.high
+    
+    write-host "high!"
+    write-host "range" ($currhigh.high - $currlow.low)
+    write-host "time of high" $currhigh.time
+    write-host "time of low" $currlow.time
+    write-host high $currhigh.high
+    write-host low $currlow.low
+    
+    }
+
+else
+    {write-host "low!"
+    write-host "range" ($currhigh.high - $currlow.low)
+    write-host "time of high" $currhigh.time
+    write-host "time of low" $currlow.time
+    write-host high $currhigh.high
+    write-host low $currlow.low
+
+    }
+
+}
 }
 }
 
