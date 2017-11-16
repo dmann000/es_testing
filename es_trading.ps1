@@ -34,11 +34,17 @@ $hod = $null
 foreach($line in ($data | where-object {$_.date -eq $day.date})) 
 {
 
+write-host $line.time
+
 if($line.high -gt $currhigh.high){
 $currhigh = $line | select-object -Property high,time
+write-host high $line.high
+write-host hod $currhigh.high
 }
-if($lod -eq $null -or $line.low -lt $currlow.low){
+if($currlow -eq $null -or $line.low -lt $currlow.low){
 $currlow = $line | select-object -Property low,time
+write-host low $line.low
+write-host lod $currlow.low
 }
 
 
