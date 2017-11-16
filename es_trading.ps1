@@ -7,24 +7,47 @@ $dates = $data | Select-Object -Property Date -Unique
 
 $dates = $dates[55]
 
+<# variables
+
+$newhigh
+$newlow
+    also need to keep times!
+
+
+arrays
+
+$highs
+$lows
+#>
+
+
 # Run a loop against each day in the dates array
 Foreach($day in $dates) 
 {
 #Set the following variables to $null on each new day
 $currhigh = $null
 $currlow = $null
+$lod = $null
+$hod = $null
 
 # Run a loop against only the lines that match the current $day variable
 foreach($line in ($data | where-object {$_.date -eq $day.date})) 
 {
-if($line.high -gt $currhigh){
-$currhigh = $line.high
-$currhightime = $line.time
-write-host $currhigh
-write-host $currhightime
+
+if($line.high -gt $currhigh.high){
+$currhigh = $line | select-object -Property high,time
+}
+if($lod -eq $null -or $line.low -lt $currlow.low){
+$currlow = $line | select-object -Property low,time
+}
+
+
 }
 }
-}
+
+# need to look for 4 bar range between high and low to establish a high that we keep!
+
+
 
 <#
 
