@@ -26,7 +26,7 @@ $dailylows = [System.Collections.ArrayList]@()
 # Gets all unique dates within the CSV and writes them to an array variable
 $dates = $data | Select-Object -Property Date -Unique
 
-$dates = $dates[-2]
+$dates = $dates[-1]
 
 # Run a loop against each day in the dates array
 $day = $null 
