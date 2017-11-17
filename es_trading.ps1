@@ -19,7 +19,7 @@ $mydocs = [Environment]::GetFolderPath("MyDocuments")
 # this run works!
 #$data = import-csv ($mydocs + "\Github\es_testing\es_5min_sample.csv")
 $data = import-csv ($mydocs + "\Github\es_testing\es_1min.csv")
-$range = 4
+$range = 3
 
 # create 2 arrays for storing highs and lows
 $dailyhighs = [System.Collections.ArrayList]@()
@@ -28,9 +28,8 @@ $dailylows = [System.Collections.ArrayList]@()
 # Gets all unique dates within the CSV and writes them to an array variable
 $dates = $data | Select-Object -Property Date -Unique
 
-# this works with the 5min on 10/31/17 (dates[-1])
-$dates = $dates[-1]
-
+# testing sample date
+#$dates= $data | Where-Object -Property Date -eq "10/16/2017"
 
 
 # Run a loop against each day in the dates array
@@ -44,13 +43,14 @@ Foreach($day in $dates)
     $maybehigh = $null
     $maybelow = $null
     $status = $null
+    $begin = $true #for first run quirks
 
     # Run a loop against only the lines that match the current $day variable
     foreach($line in ($data | where-object {$_.date -eq $day.date})) 
     {
-
     
     if($status -eq "low4high"){
+    <#
     write-host "low4high" $line.time
     write-host "high " $line.high
     write-host "low " $line.low
@@ -59,6 +59,7 @@ Foreach($day in $dates)
 	write-host "maybehigh " $maybehigh.high
 	write-host "maybelow " $maybelow.low
     pause
+    #>
 
     if($line.low -lt $maybelow.low){
     $currhigh = $line | select-object -Property high,date,time
@@ -69,9 +70,12 @@ Foreach($day in $dates)
 	$currhigh = $line | select-object -Property high,date,time
     if($currhigh.high - $maybelow.low -ge $range){
     $dailylows.add($maybelow)
+    $maybelow = $null
     $status = "look4high"
     }elseif($line.time -eq "16:10:00"){
     $dailylows.add($maybelow)
+
+    $maybelow = $null
     exit
     }
 
@@ -86,6 +90,7 @@ Foreach($day in $dates)
 	we have an established low, and are now looking for the next high (but still need to check if make a new low)
 	#>
 
+    <#
     write-host "look4low" $line.time 
     write-host "high " $line.high
     write-host "low " $line.low
@@ -94,13 +99,15 @@ Foreach($day in $dates)
 	write-host "maybehigh " $maybehigh.high
 	write-host "maybelow " $maybelow.low
     pause
+    #>
 
     #some code for the uniquness of first of day
-    if($maybehigh -eq $null){
+    if($begin -eq $true){
         if($line.low -lt $currlow.low){
         $currlow = $line | Select-Object -Property low,date,time
         }elseif($line.low -ge $currlow.low){
         $maybelow = $currlow
+        $begin = $false
         $currhigh = $line | select-object -Property high,date,time
         $status = "low4high"
         }
@@ -124,6 +131,7 @@ Foreach($day in $dates)
 
         
     elseif($status -eq "high4low"){
+    <#
     write-host "high4low" $line.time
     write-host "high " $line.high
     write-host "low " $line.low
@@ -132,6 +140,7 @@ Foreach($day in $dates)
 	write-host "maybehigh " $maybehigh.high
 	write-host "maybelow " $maybelow.low
     pause
+    #>
 
     if($line.high -gt $maybehigh.high){
     $currlow = $line | select-object -Property low,date,time
@@ -142,16 +151,19 @@ Foreach($day in $dates)
 	$currlow = $line | select-object -Property low,date,time
     if($maybehigh.high - $currlow.low -ge $range){
     $dailyhighs.add($maybehigh)
+    $maybehigh = $null
     $status = "look4low" # switch to low4high?
     }
     elseif($line.time -eq "16:10:00"){
     $dailyhighs.add($maybehigh)
+    $maybehigh = $null
     exit
     }
     }}
     
     elseif($status -eq "look4high"){
 
+    <#
     write-host "look4high" $line.time
     write-host "high " $line.high
     write-host "low " $line.low
@@ -160,13 +172,15 @@ Foreach($day in $dates)
 	write-host "maybehigh " $maybehigh.high
 	write-host "maybelow " $maybelow.low
     pause
+    #>
 
     #some code for the uniquness of first of day
-    if($maybelow -eq $null){
+    if($begin -eq $true){
         if($line.high -gt $currhigh.high){
         $currhigh = $line | Select-Object -Property high,date,time
         }elseif($line.high -le $currhigh.high){
         $maybehigh = $currhigh
+        $begin = $false
         $currlow = $line | select-object -Property low,date,time
         $status = "high4low"
         }
@@ -183,7 +197,8 @@ Foreach($day in $dates)
     }
 	}else{
 
-    write-host "opening" $line.time
+    <#
+    write-host "time" $line.time
     write-host "high " $line.high
     write-host "low " $line.low
     write-host "currhigh " $currhigh.high
@@ -195,6 +210,7 @@ Foreach($day in $dates)
     write-host "high established"}
     else{write-host "low established"}
     pause
+    #>
 
 
     # check to see if the current line/bar's high is higher than before
@@ -216,7 +232,7 @@ Foreach($day in $dates)
         write-host $line.time "times are the same"
         }
     
-    elseif($currhigh.time -lt $currlow.time){ # THIS SEEMS BACKWARD TO ME!!!
+    elseif($currhigh.time -gt $currlow.time){
         $dailyhighs.add($currhigh)
         $status = "look4low" # switch to low4high?
         write-host "added high"
