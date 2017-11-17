@@ -255,3 +255,13 @@ Foreach($day in $dates)
 }
 }
 }
+
+$highlow = [System.Collections.ArrayList]@()
+$highlow | Add-Member -MemberType NoteProperty -Name High -Value $null
+$highlow | Add-Member -MemberType NoteProperty -Name Low -Value $null
+$highlow | Add-Member -MemberType NoteProperty -Name Date -Value $null
+$highlow | Add-Member -MemberType NoteProperty -Name Time -Value $null
+
+$highlow = $dailyhighs + $dailylows
+
+$highlow | sort time -Descending | sort date -Descending
