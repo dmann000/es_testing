@@ -38,6 +38,7 @@ $dailylows = [System.Collections.ArrayList]@()
 $dates = foreach($line in $data){get-date $line.date.date -Format MM/dd/yyyy}
 $dates = $dates | get-unique
 
+# $dates = "10/17/2017"
 
 # testing sample date
 #$dates= $data | Where-Object -Property Date -eq "10/16/2017"
@@ -56,11 +57,14 @@ Foreach($day in $dates)
     $status = $null
     $begin = $true #for first run quirks
 
+    write-host $da
+
     # Run a loop against only the lines that match the current $day variable
     foreach($line in ($data | where-object {$_.date.date -eq $day})) 
     {
     
     if($status -eq "low4high"){
+    
     <#
     write-host "low4high" $line.time
     write-host "high " $line.high
@@ -83,13 +87,13 @@ Foreach($day in $dates)
     $dailylows.add($maybelow)
     $maybelow = $null
     $status = "look4high"
-    }elseif($line.date.hour -eq 16 -and $line.date.minute -eq 10){
+    }elseif($line.date.hour -eq 16 -and $line.date.minute -eq 14){
     $dailylows.add($maybelow)
-
     $maybelow = $null
-    exit
     }
-
+    {elseif($line.date.hour -ge 16 -and $line.date.minute -gt 14){
+    }
+    }
     }
     }
     
@@ -133,12 +137,13 @@ Foreach($day in $dates)
         $status = "low4high"
 	    $currlow = $line | select-object -Property low,date
 		$currhigh = $line | select-object -Property high,date
-    }elseif($line.date.hour -eq 16 -and $line.date.minute -eq 10){
+    }elseif($line.date.hour -eq 16 -and $line.date.minute -eq 14){
     $dailyhighs.add($currhigh)
-    exit
+    {elseif($line.date.hour -ge 16 -and $line.date.minute -gt 14){
     }
     }
-
+    }
+    }
 
         
     elseif($status -eq "high4low"){
@@ -165,13 +170,15 @@ Foreach($day in $dates)
     $maybehigh = $null
     $status = "look4low" # switch to low4high?
     }
-    elseif($line.date.hour -eq 16 -and $line.date.minute -eq 10){
+    elseif($line.date.hour -eq 16 -and $line.date.minute -eq 14){
     $dailyhighs.add($maybehigh)
     $maybehigh = $null
-    exit
     }
+    {elseif($line.date.hour -ge 16 -and $line.date.minute -gt 14){
     }}
-    
+    }}
+
+
     elseif($status -eq "look4high"){
 
     <#
@@ -240,24 +247,17 @@ Foreach($day in $dates)
 
     # now check to see which is "older"
     if($currhigh.date -eq $currlow.date){
-        write-host $line.date "times are the same"
         }
     
     elseif($currhigh.date -lt $currlow.date){
         $dailyhighs.add($currhigh)
         $status = "look4low" # switch to low4high?
-        write-host "added high"
-        write-host $currhigh
-        write-host $line.date
-        write-host "low" $currlow
         }
 
     else{
         $dailylows.add($currlow)
         $status = "look4high"
-        write-host "added low"
-        write-host $currlow
-        write-host $line.date
+
         
        }
 
@@ -267,14 +267,12 @@ Foreach($day in $dates)
 }
 }
 
-<#
-$highlow = [System.Collections.ArrayList]@()
-$highlow | Add-Member -MemberType NoteProperty -Name High -Value $null
-$highlow | Add-Member -MemberType NoteProperty -Name Low -Value $null
-$highlow | Add-Member -MemberType NoteProperty -Name Date -Value $null
-$highlow | Add-Member -MemberType NoteProperty -Name Time -Value $null
 
 $highlow = $dailyhighs + $dailylows
 
-$highlow | sort time -Descending | sort date -Descending
-#>
+$highlow | Add-Member -MemberType NoteProperty -Name Low -Value $null -ErrorAction Ignore
+
+$highlow = $dailyhighs + $dailylows
+
+$highlow = $highlow | Sort-Object -Property Date
+
