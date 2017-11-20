@@ -57,22 +57,30 @@ Foreach($day in $dates)
     $status = $null
     $begin = $true #for first run quirks
 
-    write-host $da
+    write-host $day
 
     # Run a loop against only the lines that match the current $day variable
     foreach($line in ($data | where-object {$_.date.date -eq $day})) 
     {
     
+    if($line.date.hour -ge 16 -and $line.date.minute -gt 14){
+    }
+    else{
+
+
+
+
     if($status -eq "low4high"){
     
     <#
-    write-host "low4high" $line.time
+    write-host "low4high" $line.date
     write-host "high " $line.high
     write-host "low " $line.low
     write-host "currhigh " $currhigh.high
 	write-host "currlow " $currlow.low
 	write-host "maybehigh " $maybehigh.high
 	write-host "maybelow " $maybelow.low
+    write-host "daily low count " $dailylows.count
     pause
     #>
 
@@ -91,7 +99,8 @@ Foreach($day in $dates)
     $dailylows.add($maybelow)
     $maybelow = $null
     }
-    {elseif($line.date.hour -ge 16 -and $line.date.minute -gt 14){
+    {elseif
+    {
     }
     }
     }
@@ -106,13 +115,14 @@ Foreach($day in $dates)
 	#>
 
     <#
-    write-host "look4low" $line.time 
+    write-host "look4low" $line.date 
     write-host "high " $line.high
     write-host "low " $line.low
     write-host "currhigh " $currhigh.high
 	write-host "currlow " $currlow.low
 	write-host "maybehigh " $maybehigh.high
 	write-host "maybelow " $maybelow.low
+    write-host "daily low count " $dailylows.count
     pause
     #>
 
@@ -139,22 +149,23 @@ Foreach($day in $dates)
 		$currhigh = $line | select-object -Property high,date
     }elseif($line.date.hour -eq 16 -and $line.date.minute -eq 14){
     $dailyhighs.add($currhigh)
-    {elseif($line.date.hour -ge 16 -and $line.date.minute -gt 14){
-    }
+    {
     }
     }
     }
 
         
     elseif($status -eq "high4low"){
+    
     <#
-    write-host "high4low" $line.time
+    write-host "high4low" $line.date
     write-host "high " $line.high
     write-host "low " $line.low
     write-host "currhigh " $currhigh.high
 	write-host "currlow " $currlow.low
 	write-host "maybehigh " $maybehigh.high
 	write-host "maybelow " $maybelow.low
+    write-host "daily low count " $dailylows.count
     pause
     #>
 
@@ -174,21 +185,20 @@ Foreach($day in $dates)
     $dailyhighs.add($maybehigh)
     $maybehigh = $null
     }
-    {elseif($line.date.hour -ge 16 -and $line.date.minute -gt 14){
-    }}
     }}
 
 
     elseif($status -eq "look4high"){
 
     <#
-    write-host "look4high" $line.time
+    write-host "look4high" $line.date
     write-host "high " $line.high
     write-host "low " $line.low
     write-host "currhigh " $currhigh.high
 	write-host "currlow " $currlow.low
 	write-host "maybehigh " $maybehigh.high
 	write-host "maybelow " $maybelow.low
+    write-host "daily low count " $dailylows.count
     pause
     #>
 
@@ -216,7 +226,7 @@ Foreach($day in $dates)
 	}else{
 
     <#
-    write-host "time" $line.time
+    write-host "time" $line.date
     write-host "high " $line.high
     write-host "low " $line.low
     write-host "currhigh " $currhigh.high
@@ -227,6 +237,7 @@ Foreach($day in $dates)
     if($currhigh.time -lt $currhigh.low){
     write-host "high established"}
     else{write-host "low established"}
+    write-host "daily low count " $dailylows.count
     pause
     #>
 
@@ -266,13 +277,31 @@ Foreach($day in $dates)
 }
 }
 }
+}
 
 
-$highlow = $dailyhighs + $dailylows
+$combined = $null
+$combined = [System.Collections.ArrayList]@()
 
-$highlow | Add-Member -MemberType NoteProperty -Name Low -Value $null -ErrorAction Ignore
 
-$highlow = $dailyhighs + $dailylows
+foreach($line in $dailyhighs){
+    $new = new-object PSObject
+    $new | Add-member -name HighLow -value "High" -MemberType NoteProperty
+    $new | Add-member -Name Date -value $line.Date -MemberType NoteProperty
+    $new | Add-member -Name Price -value $line.high -membertype NoteProperty
 
-$highlow = $highlow | Sort-Object -Property Date
+    $combined += $new
+    }
 
+foreach($line in $dailylows){
+    $new = new-object PSObject
+    $new | Add-member -name HighLow -value "Low" -MemberType NoteProperty
+    $new | Add-member -Name Date -value $line.Date -MemberType NoteProperty
+    $new | Add-member -Name Price -value $line.low -membertype NoteProperty
+    $combined += $new
+    }
+
+
+$combined = $combined | Sort-Object -property Date
+
+$combined | export-csv ($mydocs + "\Github\es_testing\highlow.csv")
