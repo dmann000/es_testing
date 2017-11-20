@@ -1,0 +1,3 @@
+#TYPE System.Collections.ArrayList
+"Capacity","Count","IsFixedSize","IsReadOnly","IsSynchronized","SyncRoot"
+"32","32","False","False","False","System.Object"
