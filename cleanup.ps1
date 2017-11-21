@@ -7,7 +7,7 @@ foreach($line in $data){
     $date = $datetime[0]
     $date = $date -replace '\d{2}(\d{2})(\d{2})(\d{2})', '$2/$3/$1'
     $date = $date -as [datetime]
-    $date = $date | get-date -Format M/dd/yyyy
+    $date = $date | get-date -Format M/d/yyyy
     $time = $datetime[1]
 
     #$new = new-object PSObject
@@ -16,6 +16,6 @@ foreach($line in $data){
 
 }
 
-$data = $data | Select-Object -Property Date,Time,Open,High,Low,Close,Volume,Count,WAP,HasGaps
+$data = $data | Select-Object -Property Date,Time,Open,High,Low,Close,Volume,Count,WAP,HasGaps | Sort-Object -Property Date
 
 $data | Export-Csv ($mydocs + "\Github\es_testing\cleaned\cleaned.csv") -NoTypeInformation
