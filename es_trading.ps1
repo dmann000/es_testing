@@ -28,7 +28,7 @@ $line.date = $datetime -as [datetime]
 }
 
 # how many points do you want between high/lows?
-$range = 3
+$range = 5
 
 # create 2 arrays for storing highs and lows
 $dailyhighs = [System.Collections.ArrayList]@()
