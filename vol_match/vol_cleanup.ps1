@@ -95,3 +95,5 @@ $cutdate = read-host -Prompt 'What day do you want to start the newer contract?'
 
 $cleaned += $older | Where-Object -Property Date -lt $cutdate
 $cleaned += $newer | where-object -Property Date -ge $cutdate
+
+$cleaned | Export-Csv ($mydocs + "\Github\es_testing\cleaned\cleaned.csv") -NoTypeInformation

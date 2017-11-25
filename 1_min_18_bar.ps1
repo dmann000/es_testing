@@ -18,8 +18,9 @@ We'll have a variable called current status.  it will be one of those 5 values
 $mydocs = [Environment]::GetFolderPath("MyDocuments")
 # this run works!
 #$data = import-csv ($mydocs + "\Github\es_testing\es_5min_sample.csv")
-$data = import-csv ($mydocs + "\Github\es_testing\es_5min_1yr.csv")
+$data = import-csv ($mydocs + "\Github\es_testing\cleaned\cleaned.csv")
 
+<#
 foreach($line in $data){
     $datetime = $line.'Date/Time' -split '  '
     $date = $datetime[0]
@@ -33,6 +34,8 @@ foreach($line in $data){
     $line | Add-Member -name Time -Value $time -MemberType NoteProperty
 
 }
+#>
+
 
 #convert date value to date/time format for posh
 foreach($line in $data){
@@ -72,7 +75,7 @@ foreach($day in $dates){
     $time = $null
     $endofday = $null
 
-    $testtime = get-date -hour 9 -Minute 59 -Millisecond 0
+    $testtime = get-date -hour 10 -Minute 29 -Millisecond 0
     $endofday = get-date -hour 16 -Minute 15 -Millisecond 0
 
     $time = ($data | Where-Object {$_.date.date -eq $day} | Where-Object {$_.date.timeofday -lt $testtime.TimeOfDay})
@@ -103,6 +106,7 @@ foreach($day in $dates){
     $totalcount = $totalcount + 1
     }
 
+    <#
     $new = new-object PSObject
     $new | Add-Member -name Date -value $day -MemberType NoteProperty
     $new | Add-member -name 11amhigh -value $11amhigh -MemberType NoteProperty
@@ -115,7 +119,7 @@ foreach($day in $dates){
     $new | Add-member -Name nonebroke -value $nonebroke -membertype NoteProperty
     
 
-    $counter += $new
+    $counter += $new #>
 
     }
     
@@ -144,4 +148,4 @@ $finaltally += $final
 
 $finaltally | ft
 
-$finaltally | export-csv ($mydocs + "\Github\es_testing\18-bar-analysis.csv") -NoTypeInformation -Append
+$finaltally | export-csv ($mydocs + "\Github\es_testing\1min_18-bar-analysis.csv") -NoTypeInformation -Append
