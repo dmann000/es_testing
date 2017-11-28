@@ -1,5 +1,13 @@
 # es_testing | Carl Mann licks my balls
 
+# real-time hours
+# $true = 9:30 - 4:15
+# $false = all bars given
+$rth = $true
+
+# how many points do you want between high/lows?
+$range = 5
+
 <#
 Okay - intial goal at the moment is to grab any highs or lows that have a 5pt range between the two...
 
@@ -18,8 +26,8 @@ We'll have a variable called current status.  it will be one of those 5 values
 $mydocs = [Environment]::GetFolderPath("MyDocuments")
 # this run works!
 #$data = import-csv ($mydocs + "\Github\es_testing\es_5min_sample.csv")
-$data = import-csv ($mydocs + "\Github\es_testing\es_1min.csv")
-
+$data = import-csv ($mydocs + "\Github\es_testing\cleaned\cleaned.csv")
+#$data = import-csv ($mydocs + "\Github\es_testing\es_1min.csv")
 
 #convert date value to date/time format for posh
 foreach($line in $data){
@@ -27,8 +35,17 @@ $datetime = $line.date + " " + $line.time
 $line.date = $datetime -as [datetime]
 }
 
-# how many points do you want between high/lows?
-$range = 5
+
+if($rth -eq $true){
+
+    $startday = get-date -hour 9 -Minute 29 -Millisecond 0
+    $endday = get-date -hour 16 -Minute 15 -Millisecond 0
+
+    $data = $data | Where-Object {$_.date.timeofday -ge $startday.TimeOfDay -and $_.date.timeofday -lt $endday.TimeOfDay}
+
+}
+
+$data = $data | sort -Property Date
 
 # create 2 arrays for storing highs and lows
 $dailyhighs = [System.Collections.ArrayList]@()
@@ -46,6 +63,16 @@ $dates = $dates | get-unique
 
 # Run a loop against each day in the dates array
 $day = $null 
+
+Foreach($day in $dates){
+$count = $null
+$count = ($data | where-object {$_.date.date -eq $day}).count
+if($count -gt 1366){
+write-host "warning - count higher than standard day!"
+write-host $day $count
+}
+}
+
 
 Foreach($day in $dates) 
 {
