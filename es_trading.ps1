@@ -22,6 +22,7 @@ high4low - we think we have established a high, now looking for a low
 We'll have a variable called current status.  it will be one of those 5 values
 #>
 
+$start = Get-Date
 
 $mydocs = [Environment]::GetFolderPath("MyDocuments")
 # this run works!
@@ -332,3 +333,9 @@ foreach($line in $dailylows){
 $combined = $combined | Sort-Object -property Date
 
 $combined | export-csv ($mydocs + "\Github\es_testing\highlow.csv")
+
+$end = Get-Date
+
+$runtime = ($end - $start).TotalMinutes
+
+$runtime

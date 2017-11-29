@@ -47,6 +47,9 @@ $data = $data + $cleaned
 $dates = $dates + $cleandates
 $data = $data | sort -Property 'Date/Time'
 
+
+# commented this out as it takes forever and may be overkill.
+<# 
 Foreach($day in $dates){
 $start = get-date
 $count = $null
@@ -63,11 +66,13 @@ write-host $day $count
 $errorcount = $errorcount + 1
 }
 }
+#>
 }else{
 write-host "error - overlapping dates"
 }
 
 if($errorcount -eq $null){
+$data = $data | Select-Object -Property Date,Time,Open,High,Low,Close,Volume,Count,WAP,HasGaps
 $data | Export-Csv ($mydocs + "\Github\es_testing\cleaned\cleaned.csv") -NoTypeInformation
 }else{
 write-host "data error - try again.  too many lines for a specific date"
