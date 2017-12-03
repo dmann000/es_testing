@@ -56,7 +56,7 @@ $dailylows = [System.Collections.ArrayList]@()
 $dates = foreach($line in $data){get-date $line.date.date -Format MM/dd/yyyy}
 $dates = $dates | get-unique
 
-# $dates = "10/17/2017"
+$dates = "11/15/2017"
 
 # testing sample date
 #$dates= $data | Where-Object -Property Date -eq "10/16/2017"
@@ -65,6 +65,7 @@ $dates = $dates | get-unique
 # Run a loop against each day in the dates array
 $day = $null 
 
+<#
 Foreach($day in $dates){
 $count = $null
 $count = ($data | where-object {$_.date.date -eq $day}).count
@@ -73,7 +74,7 @@ write-host "warning - count higher than standard day!"
 write-host $day $count
 }
 }
-
+#>
 
 Foreach($day in $dates) 
 {
@@ -100,7 +101,7 @@ Foreach($day in $dates)
 
     if($status -eq "low4high"){
     
-    <#
+    
     write-host "low4high" $line.date
     write-host "high " $line.high
     write-host "low " $line.low
@@ -110,7 +111,7 @@ Foreach($day in $dates)
 	write-host "maybelow " $maybelow.low
     write-host "daily low count " $dailylows.count
     pause
-    #>
+    
 
     if($line.low -lt $maybelow.low){
     $currhigh = $line | select-object -Property high,date
@@ -142,7 +143,7 @@ Foreach($day in $dates)
 	we have an established low, and are now looking for the next high (but still need to check if make a new low)
 	#>
 
-    <#
+    
     write-host "look4low" $line.date 
     write-host "high " $line.high
     write-host "low " $line.low
@@ -152,7 +153,7 @@ Foreach($day in $dates)
 	write-host "maybelow " $maybelow.low
     write-host "daily low count " $dailylows.count
     pause
-    #>
+    
 
     #some code for the uniquness of first of day
     if($begin -eq $true){
@@ -185,7 +186,7 @@ Foreach($day in $dates)
         
     elseif($status -eq "high4low"){
     
-    <#
+    
     write-host "high4low" $line.date
     write-host "high " $line.high
     write-host "low " $line.low
@@ -195,7 +196,7 @@ Foreach($day in $dates)
 	write-host "maybelow " $maybelow.low
     write-host "daily low count " $dailylows.count
     pause
-    #>
+    
 
     if($line.high -gt $maybehigh.high){
     $currlow = $line | select-object -Property low,date
@@ -218,7 +219,7 @@ Foreach($day in $dates)
 
     elseif($status -eq "look4high"){
 
-    <#
+    
     write-host "look4high" $line.date
     write-host "high " $line.high
     write-host "low " $line.low
@@ -228,7 +229,7 @@ Foreach($day in $dates)
 	write-host "maybelow " $maybelow.low
     write-host "daily low count " $dailylows.count
     pause
-    #>
+    
 
     #some code for the uniquness of first of day
     if($begin -eq $true){
@@ -253,7 +254,7 @@ Foreach($day in $dates)
     }
 	}else{
 
-    <#
+    
     write-host "time" $line.date
     write-host "high " $line.high
     write-host "low " $line.low
@@ -262,12 +263,14 @@ Foreach($day in $dates)
 	write-host "maybehigh " $maybehigh.high
 	write-host "maybelow " $maybelow.low
     write-host "range " ($currhigh.high - $currlow.low)
-    if($currhigh.time -lt $currhigh.low){
+    if($currhigh.time -lt $currlow.time){
     write-host "high established"}
-    else{write-host "low established"}
+    elseif($currlow.time -lt $currhigh.time){
+    write-host "low established"}
+    write-host "daily high count " $dailyhighs.count
     write-host "daily low count " $dailylows.count
     pause
-    #>
+    
 
 
     # check to see if the current line/bar's high is higher than before
@@ -332,7 +335,7 @@ foreach($line in $dailylows){
 
 $combined = $combined | Sort-Object -property Date
 
-$combined | export-csv ($mydocs + "\Github\es_testing\highlow.csv")
+# $combined | export-csv ($mydocs + "\Github\es_testing\highlow.csv")
 
 $end = Get-Date
 
