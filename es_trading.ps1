@@ -79,8 +79,8 @@ write-host $day $count
 Foreach($day in $dates) 
 {
     #Set the following variables to $null on each new day
-    $currhigh = $null
-    $currlow = $null
+    $priorhigh = $null
+    $priorlow = $null
     $maybehigh = $null
     $maybelow = $null
     $status = $null
@@ -105,8 +105,8 @@ Foreach($day in $dates)
     write-host "low4high" $line.date
     write-host "high " $line.high
     write-host "low " $line.low
-    write-host "currhigh " $currhigh.high
-	write-host "currlow " $currlow.low
+    write-host "priorhigh " $priorhigh.high
+	write-host "priorlow " $priorlow.low
 	write-host "maybehigh " $maybehigh.high
 	write-host "maybelow " $maybelow.low
     write-host "daily low count " $dailylows.count
@@ -114,13 +114,13 @@ Foreach($day in $dates)
     
 
     if($line.low -lt $maybelow.low){
-    $currhigh = $line | select-object -Property high,date
+    $priorhigh = $line | select-object -Property high,date
 	$maybelow = $line | select-object -Property low,date
     $status = "look4low"
 	
-	}elseif($line.high -gt $currhigh.high){
-	$currhigh = $line | select-object -Property high,date
-    if($currhigh.high - $maybelow.low -ge $range){
+	}elseif($line.high -gt $priorhigh.high){
+	$priorhigh = $line | select-object -Property high,date
+    if($priorhigh.high - $maybelow.low -ge $range){
     $dailylows.add($maybelow)
     $maybelow = $null
     $status = "look4high"
@@ -147,8 +147,8 @@ Foreach($day in $dates)
     write-host "look4low" $line.date 
     write-host "high " $line.high
     write-host "low " $line.low
-    write-host "currhigh " $currhigh.high
-	write-host "currlow " $currlow.low
+    write-host "priorhigh " $priorhigh.high
+	write-host "priorlow " $priorlow.low
 	write-host "maybehigh " $maybehigh.high
 	write-host "maybelow " $maybelow.low
     write-host "daily low count " $dailylows.count
@@ -157,27 +157,27 @@ Foreach($day in $dates)
 
     #some code for the uniquness of first of day
     if($begin -eq $true){
-        if($line.low -lt $currlow.low){
-        $currlow = $line | Select-Object -Property low,date
-        }elseif($line.low -ge $currlow.low){
-        $maybelow = $currlow
+        if($line.low -lt $priorlow.low){
+        $priorlow = $line | Select-Object -Property low,date
+        }elseif($line.low -ge $priorlow.low){
+        $maybelow = $priorlow
         $begin = $false
-        $currhigh = $line | select-object -Property high,date
+        $priorhigh = $line | select-object -Property high,date
         $status = "low4high"
         }
     }
 
-	elseif($line.low -lt $currlow.low){
-	    $currlow = $line | select-object -Property low,date
-        $currhigh = $line | Select-Object -Property high,date
+	elseif($line.low -lt $priorlow.low){
+	    $priorlow = $line | select-object -Property low,date
+        $priorhigh = $line | Select-Object -Property high,date
     }
-	elseif($line.high -gt $currhigh.high){
-        $maybelow = $currlow
+	elseif($line.high -gt $priorhigh.high){
+        $maybelow = $priorlow
         $status = "low4high"
-	    $currlow = $line | select-object -Property low,date
-		$currhigh = $line | select-object -Property high,date
+	    $priorlow = $line | select-object -Property low,date
+		$priorhigh = $line | select-object -Property high,date
     }elseif($line.date.hour -eq 16 -and $line.date.minute -eq 14){
-    $dailyhighs.add($currhigh)
+    $dailyhighs.add($priorhigh)
     {
     }
     }
@@ -190,8 +190,8 @@ Foreach($day in $dates)
     write-host "high4low" $line.date
     write-host "high " $line.high
     write-host "low " $line.low
-    write-host "currhigh " $currhigh.high
-	write-host "currlow " $currlow.low
+    write-host "priorhigh " $priorhigh.high
+	write-host "priorlow " $priorlow.low
 	write-host "maybehigh " $maybehigh.high
 	write-host "maybelow " $maybelow.low
     write-host "daily low count " $dailylows.count
@@ -199,13 +199,13 @@ Foreach($day in $dates)
     
 
     if($line.high -gt $maybehigh.high){
-    $currlow = $line | select-object -Property low,date
+    $priorlow = $line | select-object -Property low,date
 	$maybehigh = $line | select-object -Property high,date
     $status = "look4high"
 
-	}elseif($line.low -lt $currlow.low){
-	$currlow = $line | select-object -Property low,date
-    if($maybehigh.high - $currlow.low -ge $range){
+	}elseif($line.low -lt $priorlow.low){
+	$priorlow = $line | select-object -Property low,date
+    if($maybehigh.high - $priorlow.low -ge $range){
     $dailyhighs.add($maybehigh)
     $maybehigh = $null
     $status = "look4low" # switch to low4high?
@@ -223,8 +223,8 @@ Foreach($day in $dates)
     write-host "look4high" $line.date
     write-host "high " $line.high
     write-host "low " $line.low
-    write-host "currhigh " $currhigh.high
-	write-host "currlow " $currlow.low
+    write-host "priorhigh " $priorhigh.high
+	write-host "priorlow " $priorlow.low
 	write-host "maybehigh " $maybehigh.high
 	write-host "maybelow " $maybelow.low
     write-host "daily low count " $dailylows.count
@@ -233,24 +233,24 @@ Foreach($day in $dates)
 
     #some code for the uniquness of first of day
     if($begin -eq $true){
-        if($line.high -gt $currhigh.high){
-        $currhigh = $line | Select-Object -Property high,date
-        }elseif($line.high -le $currhigh.high){
-        $maybehigh = $currhigh
+        if($line.high -gt $priorhigh.high){
+        $priorhigh = $line | Select-Object -Property high,date
+        }elseif($line.high -le $priorhigh.high){
+        $maybehigh = $priorhigh
         $begin = $false
-        $currlow = $line | select-object -Property low,date
+        $priorlow = $line | select-object -Property low,date
         $status = "high4low"
         }
     }
-	elseif($line.high -gt $currhigh.high){
-	    $currhigh = $line | select-object -Property high,date
-        $currlow = $line | Select-Object -Property low,date
+	elseif($line.high -gt $priorhigh.high){
+	    $priorhigh = $line | select-object -Property high,date
+        $priorlow = $line | Select-Object -Property low,date
     }
-	elseif($line.low -lt $currlow.low){
-        $maybehigh = $currhigh
+	elseif($line.low -lt $priorlow.low){
+        $maybehigh = $priorhigh
         $status = "high4low"
-	    $currhigh = $line | select-object -Property high,date
-		$currlow = $line | select-object -Property low,date
+	    $priorhigh = $line | select-object -Property high,date
+		$priorlow = $line | select-object -Property low,date
     }
 	}else{
 
@@ -258,14 +258,14 @@ Foreach($day in $dates)
     write-host "time" $line.date
     write-host "high " $line.high
     write-host "low " $line.low
-    write-host "currhigh " $currhigh.high
-	write-host "currlow " $currlow.low
+    write-host "priorhigh " $priorhigh.high
+	write-host "priorlow " $priorlow.low
 	write-host "maybehigh " $maybehigh.high
 	write-host "maybelow " $maybelow.low
-    write-host "range " ($currhigh.high - $currlow.low)
-    if($currhigh.time -lt $currlow.time){
+    write-host "range " ($priorhigh.high - $priorlow.low)
+    if($priorhigh.time -lt $priorlow.time){
     write-host "high established"}
-    elseif($currlow.time -lt $currhigh.time){
+    elseif($priorlow.time -lt $priorhigh.time){
     write-host "low established"}
     write-host "daily high count " $dailyhighs.count
     write-host "daily low count " $dailylows.count
@@ -275,29 +275,29 @@ Foreach($day in $dates)
 
     # check to see if the current line/bar's high is higher than before
     
-    if($line.high -gt $currhigh.high){
-    $currhigh = $line | select-object -Property high,date
+    if($line.high -gt $priorhigh.high){
+    $priorhigh = $line | select-object -Property high,date
     }
 
     # check to see if the current line/bar's low is lower than before
-    if($currlow -eq $null -or $line.low -lt $currlow.low){
-    $currlow = $line | select-object -Property low,date
+    if($priorlow -eq $null -or $line.low -lt $priorlow.low){
+    $priorlow = $line | select-object -Property low,date
     }
 
-    # now check to see if we have enough distance from currhigh and currlow to establish whichever is "older"
-    if($currhigh.high - $currlow.low -ge $range){
+    # now check to see if we have enough distance from priorhigh and priorlow to establish whichever is "older"
+    if($priorhigh.high - $priorlow.low -ge $range){
 
     # now check to see which is "older"
-    if($currhigh.date -eq $currlow.date){
+    if($priorhigh.date -eq $priorlow.date){
         }
     
-    elseif($currhigh.date -lt $currlow.date){
-        $dailyhighs.add($currhigh)
+    elseif($priorhigh.date -lt $priorlow.date){
+        $dailyhighs.add($priorhigh)
         $status = "look4low" # switch to low4high?
         }
 
     else{
-        $dailylows.add($currlow)
+        $dailylows.add($priorlow)
         $status = "look4high"
 
         
