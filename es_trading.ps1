@@ -1,4 +1,4 @@
-# es_testing | Carl Mann licks my balls
+# es_testing
 
 # real-time hours
 # $true = 9:30 - 4:15
@@ -92,13 +92,6 @@ Foreach($day in $dates)
     foreach($line in ($data | where-object {$_.date.date -eq $day})) 
     {
     
-    if($line.date.hour -ge 16 -and $line.date.minute -gt 14){
-    }
-    else{
-
-
-
-
     if($status -eq "low4high"){
     
     
@@ -307,7 +300,7 @@ Foreach($day in $dates)
 
 }
 }
-}
+
 }
 
 
@@ -335,7 +328,7 @@ foreach($line in $dailylows){
 
 $combined = $combined | Sort-Object -property Date
 
-# $combined | export-csv ($mydocs + "\Github\es_testing\highlow.csv")
+$combined | export-csv ($mydocs + "\Github\es_testing\highlow.csv")
 
 $end = Get-Date
 
