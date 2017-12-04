@@ -4,6 +4,9 @@
 # $true = 9:30 - 4:15
 # $false = all bars given
 $rth = $true
+# specify market hours (only gets used if rth = $true)
+$startday = get-date -hour 9 -Minute 29 -Millisecond 0
+$endday = get-date -hour 16 -Minute 15 -Millisecond 0
 
 # how many points do you want between high/lows?
 $range = 5
@@ -22,13 +25,11 @@ high4low - we think we have established a high, now looking for a low
 We'll have a variable called current status.  it will be one of those 5 values
 #>
 
+# start time to capture runtime
 $start = Get-Date
 
 $mydocs = [Environment]::GetFolderPath("MyDocuments")
-# this run works!
-#$data = import-csv ($mydocs + "\Github\es_testing\es_5min_sample.csv")
 $data = import-csv ($mydocs + "\Github\es_testing\cleaned\cleaned.csv")
-#$data = import-csv ($mydocs + "\Github\es_testing\es_1min.csv")
 
 #convert date value to date/time format for posh
 foreach($line in $data){
@@ -37,10 +38,8 @@ $line.date = $datetime -as [datetime]
 }
 
 
+#if you enable rth only - 
 if($rth -eq $true){
-
-    $startday = get-date -hour 9 -Minute 29 -Millisecond 0
-    $endday = get-date -hour 16 -Minute 15 -Millisecond 0
 
     $data = $data | Where-Object {$_.date.timeofday -ge $startday.TimeOfDay -and $_.date.timeofday -lt $endday.TimeOfDay}
 
@@ -56,31 +55,22 @@ $dailylows = [System.Collections.ArrayList]@()
 $dates = foreach($line in $data){get-date $line.date.date -Format MM/dd/yyyy}
 $dates = $dates | get-unique
 
+# *** FOR TESTING PURPOSES ONLY ***
+#comment this out for the full script
 $dates = "11/15/2017"
-
-# testing sample date
-#$dates= $data | Where-Object -Property Date -eq "10/16/2017"
-
 
 # Run a loop against each day in the dates array
 $day = $null 
 
-<#
-Foreach($day in $dates){
-$count = $null
-$count = ($data | where-object {$_.date.date -eq $day}).count
-if($count -gt 1366){
-write-host "warning - count higher than standard day!"
-write-host $day $count
-}
-}
-#>
-
 Foreach($day in $dates) 
 {
     #Set the following variables to $null on each new day
+    # priorhigh and priorlow are to hold the most recent high or low to compare against current bar
     $priorhigh = $null
     $priorlow = $null
+    # maybehigh and maybelow are to hold the high or low that we believe to be the established high or low (once market has turned and identified a high or low)
+    # we have to hold this until the market
+    # do we really need this??? not sure checking
     $maybehigh = $null
     $maybelow = $null
     $status = $null
@@ -245,7 +235,8 @@ Foreach($day in $dates)
 	    $priorhigh = $line | select-object -Property high,date
 		$priorlow = $line | select-object -Property low,date
     }
-	}else{
+	}
+    if($begin -eq $true){
 
     
     write-host "time" $line.date
