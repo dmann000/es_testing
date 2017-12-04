@@ -236,6 +236,7 @@ Foreach($day in $dates)
 		$priorlow = $line | select-object -Property low,date
     }
 	}
+
     if($begin -eq $true){
 
     
@@ -259,7 +260,7 @@ Foreach($day in $dates)
 
     # check to see if the current line/bar's high is higher than before
     
-    if($line.high -gt $priorhigh.high){
+    if($priorhigh -eq $null -or $line.high -gt $priorhigh.high){
     $priorhigh = $line | select-object -Property high,date
     }
 
