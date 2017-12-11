@@ -61,8 +61,6 @@ $highlow = [System.Collections.ArrayList]@()
 foreach($line in $data){
 
 
-
-
     if($line.high -gt $priorhigh.high){
         $priorhigh = $line | select-object -Property high,date
         }
@@ -70,8 +68,19 @@ foreach($line in $data){
         $priorlow = $line | Select-Object -Property low,date
         }
 
-$currrange = ($priorhigh.high - $priorlow.low)
-    if($priorhigh.high - $priorlow.low -ge $range){
+$recentHL = $highlow[-1]
+
+if($recentHL -eq $null){
+    $currrange = $priorhigh.high - $priorlow.low}
+
+elseif($recentHL.highlow -eq "Low"){
+    $currrange = $priorhigh.high - $recentHL.price}
+
+elseif($recentHL.highlow -eq "High"){
+    $currrange = $recentHL.price - $priorlow.low}
+
+
+    if($currrange -ge $range){
         # determine if high and low timestamp are the same, if so do nothing.  wait till next bar
         if($priorhigh.date -ne $priorlow.date){
         if($priorhigh.date -lt $priorlow.date){
@@ -96,18 +105,12 @@ $currrange = ($priorhigh.high - $priorlow.low)
         }
 
         }
-        write-host $line.date
-        write-host "high " $line.high
-        write-host "low " $line.low
-        write-host "prior-high " $priorhigh.high
-        write-host "prior-low " $priorlow.low
         write-host "range " $currrange
-        $currrange = $null
-        write-host ""
-
-        
-        
+        write-host high $priorhigh.high
+        write-host low $priorlow.low
+        write-host $line.date
         pause
+
 }
 
 
