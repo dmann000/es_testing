@@ -6,7 +6,16 @@ goals are to cleanup the overall logic of the main portion of the script
 will also try to comment every where possible
 #>
 
+<#
+$Global:price2 = $null
+Function Get-round{
+Param ($price, $number)
+$global:price2 = $price + $number
 
+}
+$Global:price2
+#>
+$Global:price2 = $null
 Function Get-round{
 Param ($price, $abovebelow)
 
@@ -23,8 +32,8 @@ Param ($price, $abovebelow)
     $rounding.add($temp - .75)
     $rounding.add($temp - 1)
     $rounding = $rounding | sort
-    if($abovebelow -eq "below"){$price = ($rounding | Where-Object {$_ -le $price})[-1]}
-    if($abovebelow -eq "above"){$price = ($rounding | Where-Object {$_ -ge $price})[0]}
+    if($abovebelow -eq "below"){$global:price2 = ($rounding | Where-Object {$_ -le $price})[-1]}
+    if($abovebelow -eq "above"){$global:price2 = ($rounding | Where-Object {$_ -ge $price})[0]}
 #    return $price
 }
 
