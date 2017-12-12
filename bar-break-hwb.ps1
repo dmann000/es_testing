@@ -175,7 +175,7 @@ foreach($line in ($data | where-object {$_.date.date -eq $day})){
                 $entry = $hwb
                 $stop = $hwb - 2
                 $target = (($hod.high - $bblow.low) * 23) + $hod.high
-                $target = (get-round($target,"above"))
+                $target = (get-round $hwb "above")
                 $target = $price
                 }
                 }
